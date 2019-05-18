@@ -1,0 +1,24 @@
+***********************************************************************************************************************************
+*                                    Planilla de avance de Trabajos Prácticos del Alumno                                          *
+*                                                                                                                                 *
+* Instrucciones: Colocar en el directorio raíz del repositorio local, para que sea de fácil acceso. Completar los datos (Usuario  * * SGE, Legajo)
+* Indicar el estado del ejercicio: Funciona: SI / NO                                                                              *
+* Agregar comentarios en caso que consideren oportuno, (por ejemplo si se compila con un makefile).                                *
+***********************************************************************************************************************************
+->Usuario SGE:isaacgaete
+->Legajo:143-712-4
+********************************************
+*		    TP 1		   *
+********************************************
+TP01.05: Funciona -> SI       Comentarios: Se compila con make desde el folder src.
+                              Consideraciones:
+TP01.06: Funciona -> SI       Comentarios: Se compila con make desde el folder src.
+                              Consideraciones:
+********************************************
+*              TP Integrador               *
+********************************************
+Filtros.C:   Funciona -> SI/NO       Comentarios:
+Filtros.ASM: Funciona -> SI/NO       Comentarios:
+Servidor:    Funciona -> SI/NO       Comentarios:
+Cliente:     Funciona -> SI/NO       Comentarios:
+OPENCV:      Funciona -> SI/NO       Comentarios:

@@ -1,0 +1,14 @@
+Next at t=0
+(0) [0x0000fffffff0] f000:fff0 (unk. ctxt): mov ax, 0x0000            ; b80000
+c
+(0) Magic breakpoint
+Next at t=18600644
+(0) [0x000000000003] 0010:0000000000000003 (unk. ctxt): xor edx, edx              ; 31d2
+Next at t=18600645
+(0) [0x000000000005] 0010:0000000000000005 (unk. ctxt): mov dx, word ptr ss:[esp+4] ; 668b542404
+Next at t=18600646
+(0) [0x00000000000a] 0010:000000000000000a (unk. ctxt): hlt                       ; f4
+c
+Next at t=42057507
+(0) [0x00000000000b] 0010:000000000000000b (unk. ctxt): ret                       ; c3
+(0).[42057507] [0x00000000000b] 0010:000000000000000b (unk. ctxt): ret                       ; c3

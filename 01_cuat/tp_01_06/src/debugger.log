@@ -1,0 +1,11 @@
+Next at t=0
+(0) [0x0000fffffff0] f000:fff0 (unk. ctxt): mov ax, 0x0000            ; b80000
+c
+(0) Magic breakpoint
+Next at t=160
+(0) [0x0000ffff0070] 0010:00000000ffff0070 (unk. ctxt): call .+3211147 (0x00300000) ; e88bff3000
+c
+(0) Magic breakpoint
+Next at t=16415017
+(0) [0x000000000037] 0010:0000000000000037 (unk. ctxt): ret                       ; c3
+(0).[16415017] [0x000000000037] 0010:0000000000000037 (unk. ctxt): ret                       ; c3
