@@ -47,9 +47,9 @@ EXTERN __CURRENT_TABLE_INDEX
 EXTERN _pic_configure
 EXTERN _pit_configure
 
-INICIO_DIR_PAG EQU 0x1000
-INICIO_TAB_PAG_RAM EQU 0x2000
-INICIO_TAB_PAG_ROM EQU 0x3000
+INICIO_PAGE_DIRECTORY EQU 0x1000 ;Las pongo en cualquier lugar
+INICIO_PAGE_TABLE_RAM EQU 0x3000 ;Separado FFF
+INICIO_PAGE_TABLE_ROM EQU 0x6000
 
 section .reset
 arranque:
@@ -79,18 +79,89 @@ modo_proteg:
   mov ss,ax ;defino ss y esp dentro del segmento de datos
   mov esp,__FIN_PILA
 
-  mov edi,INICIO_DIR_PAG
-  mov ecx,INICIO_TAB_PAG_ROM/4
 
+
+  ;Borro la memoria, en donde voy a poner mis tablas
+
+  mov edi,INICIO_PAGE_DIRECTORY
+  mov ecx,INICIO_PAGE_TABLE_ROM/4
   xor eax,eax
-  .ciclo_borrado_tablas_paginacion:
+
+.ciclo_borrado_tablas_paginacion:
   mov [edi],eax
   add edi,4
   dec ecx
-  cmp ecx,0
-  jne .ciclo_borrado_tablas_paginacion
+  jnz .ciclo_borrado_tablas_paginacion
 
-  
+  ;Lleno las tablas desde a
+  ;00000000h
+  ;004E0000h
+
+  ;La direccion minima es 0x00000000 = 0000 0000 00.00 0000 0000.0000 0000 0000 [10bits.10bits.12bits]
+  ;La direccion maxima es 0x004E0000 = 0000 0000 01.00 1110 0000.0000 0000 0000 [10bits.10bits.12bits]
+
+  ;Primeros 10 bits minimos = xx0000000000 = 000
+
+    ;Para 0x000
+    ;Segundos 10 bits minimos = xx00.0000.0000 = 000
+    ;Segundos 10 bits maximos = xx11.1111.1111 = 3FF [En decimal son 3*16*16=768]
+
+  ;Primeros 10 bits maximos = xx0000000001 = 001
+
+    ;Para 0x001
+    ;Segundos 10 bits minimos = xx00.0000.0000 = 000
+    ;Segundos 10 bits maximos = xx00.1110.0000 = 0E0 [En decimal son 16*15=240]
+
+  ;Por lo tanto son 2 entradas en el directorio de paginas que tienen que apuntar a las tablas de paginas
+  mov dword[INICIO_PAGE_DIRECTORY+0x000*4],INICIO_PAGE_TABLE_RAM+0x3
+  mov dword[INICIO_PAGE_DIRECTORY+0x001*4],INICIO_PAGE_TABLE_RAM+0x400*4+0x3
+
+  mov ecx,0x3FF
+  add ecx,0x0E0
+  add ecx,1
+
+  ;Completo la primeras paginas de RAM y las segundas
+  mov edi,INICIO_PAGE_TABLE_RAM
+  mov eax,0x00000000+0x3
+ciclo_llenado_tablas_ram:
+  mov [edi],eax
+  add edi,4 ;Me muevo al proximo offset que es 4 bytes
+  add eax,0x1000 ;la siguiente pagina esta 4kb adelante
+  dec ecx
+  jnz ciclo_llenado_tablas_ram
+
+  ;Ahora pagino la rom
+  ;La direccion es 0xFFFF0000 = 1111111111.1111110000.000000000000 [10bits.10bits.12bits]
+  ;Primeros 10 bits = xx1111111111 = 3FF
+  mov dword[INICIO_PAGE_DIRECTORY+0x3FF*4],INICIO_PAGE_TABLE_ROM+0x3
+  ;Lo que coloco es el INICIO_PAGE_TABLE_ROM y sus atributos a nivel directorio que se suman
+
+  ;Segundos 10 bits = xx1111110000 = 3F0
+  ;Tengo que llenar las tablas de rom que son 16, 16x4kb=64kb (FFFF)
+
+  ;Base + indice * 4 (como siempre para avanzar de a 4 bytes)
+  mov edi,INICIO_PAGE_TABLE_ROM+0x3F0*4
+  mov eax,0xFFFF0000+0x3 ;Coloco la primer direccion de la ROM
+  mov ecx,0x10
+
+.ciclo_set_page_table_rom:
+  mov [edi],eax
+  add edi,4 ;Me muevo al proximo offset que es 4 bytes
+  add eax,0x1000 ;la siguiente pagina esta 4kb adelante
+  dec ecx
+  jnz .ciclo_set_page_table_rom
+
+  mov eax,INICIO_PAGE_DIRECTORY
+  mov cr3,eax
+
+  ;activo la paginacion con cr0
+  mov eax,cr0
+  or eax,0x80000000
+  mov cr0,eax
+
+  ;TODO corregir esto, hay que paginar la pila correctamente
+  ;Por el momento con esto funciona
+  mov esp,0x00400000
 
   xor edx,edx
   mov [__CURRENT_TABLE_INDEX],edx
@@ -112,6 +183,7 @@ modo_proteg:
   call config_irq
   ;A partir de este momento estan habilitadas las interrupciones
   sti
+
 
 main:
   call __INICIO_TEXT_TAREA_1_RAM
