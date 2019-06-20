@@ -10,6 +10,7 @@ EXTERN __INICIO_INVALIDATE_EN_NUCLEO_RAM
 section .isr_teclado
 USE32
   pushad
+  xchg bx,bx
 
   in al,__BUFFER_TECLADO               ;Obtener informacion del controlador de teclado
   mov bl,al ;Guardo el valor leido

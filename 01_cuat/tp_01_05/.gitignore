@@ -12,6 +12,8 @@
 /src/*.o
 /src/*.bin
 /src/*.elf
+/src/*.log
+/src/*.ini
 /src/*.map
 /src/*.lst
 /sup/*.o
