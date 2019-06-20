@@ -1,0 +1,155 @@
+     1                                  EXTERN __FIN_PILA
+     2                                  
+     3                                  INICIO_PAGE_DIRECTORY EQU 0x1000 ;Las pongo en cualquier lugar
+     4                                  INICIO_PAGE_TABLE_RAM EQU 0x2000 ;Separado FFFF
+     5                                  INICIO_PAGE_TABLE_ROM EQU 0x3000
+     6                                  
+     7                                  EXTERN _pic_configure
+     8                                  EXTERN _pit_configure
+     9                                  
+    10                                  section .reset
+    11                                  arranque:
+    12                                  USE16
+    13 00000000 B80000                    mov ax,0
+    14 00000003 FFE0                      jmp ax
+    15                                    ;salto a inicio16
+    16 00000005 00<rept>                  times 16-($-arranque) db 0
+    17                                  
+    18                                  section .init
+    19 00000000 E92C01                    jmp inicio
+    20                                    gdt:
+    21 00000003 0000000000000000                    db 0,0,0,0,0,0,0,0  ;Descriptor nulo
+    22                                    ds_sel    equ $-gdt
+    23 0000000B FFFF00000092CF00                    db 0xFF, 0xFF, 0, 0, 0, 0x92, 0xCF, 0
+    24                                    cs_sel    equ $-gdt
+    25 00000013 FFFF0000009ACF00                  db 0xFF, 0xFF, 0, 0, 0, 0x9A, 0xCF, 0
+    26                                  
+    27                                    long_gdt equ $-gdt
+    28                                  
+    29                                    img_gdtr:
+    30 0000001B 1700                      		  dw long_gdt-1
+    31 0000001D [03000000]                		  dd gdt
+    32                                  
+    33                                  idt:
+    34 00000021 0000000000000000-         TIMES 0x20 dq 0;todo a 0 qd(quad words-8 bytes a 0)
+    34 00000021 <rept>             
+    35                                    ;Compuerta de interrupcion
+    36 00000121 [E401]                    dw _handler_timer ;Offset de mi manejador
+    37 00000123 1000                      dw cs_sel ;Selector de codigo
+    38 00000125 00                        db 0x0
+    39 00000126 8E                        db 0x8E ;Indico que es de interrupcion
+    40 00000127 FFFF                      dw 0xFFFF
+    41                                  long_idt equ $-idt
+    42                                  
+    43                                  img_idtr:
+    44 00000129 0701                          dw long_idt-1
+    45 0000012B [21000000]                    dd idt
+    46                                  
+    47                                  inicio:
+    48 0000012F 66B8F0FFFFFF              mov eax,0xFFFFFFF0
+    49 00000135 66A30000                  mov [0],eax
+    50 00000139 FA                        cli       ;Deshabilito interrupciones
+    51 0000013A 66                        db 0x66            ;Requerido para direcciones mayores
+    52 0000013B 2E0F0116[1B00]            lgdt  [cs:img_gdtr] ;que 0x00FFFFFFF.
+    53 00000141 0F20C0                    mov eax,cr0        ;Habiltación bit de modo protegido.
+    54 00000144 6683C801                  or eax,1
+    55 00000148 0F22C0                    mov cr0,eax
+    56 0000014B 66EA[53010000]1000        jmp dword cs_sel:modo_proteg
+    57                                  
+    58                                  USE32
+    59                                  modo_proteg:
+    60 00000153 66B80800                  mov ax,ds_sel
+    61 00000157 8ED8                      mov ds,ax
+    62 00000159 8ED0                      mov ss,ax ;defino ss y esp dentro del segmento de datos
+    63 0000015B BC[00000000]              mov esp,__FIN_PILA
+    64                                  
+    65                                  
+    66                                    ;Borro la memoria, en donde voy a poner mis tablas
+    67 00000160 BF00100000                mov edi,INICIO_PAGE_DIRECTORY
+    68 00000165 B9000C0000                mov ecx,INICIO_PAGE_TABLE_ROM/4
+    69 0000016A 31C0                      xor eax,eax
+    70                                  
+    71                                  .ciclo_borrado_tablas_paginacion:
+    72 0000016C 8907                      mov [edi],eax
+    73 0000016E 83C704                    add edi,4
+    74 00000171 49                        dec ecx
+    75 00000172 75F8                      jnz .ciclo_borrado_tablas_paginacion
+    76                                  
+    77 00000174 6687DB                    xchg bx,bx
+    78                                  
+    79                                    ;Lleno las tablas
+    80                                  
+    81                                    ;La direccion es 0x40000000 = 0100000000.0000000000.000000000000 [10bits.10bits.12bits]
+    82                                    ;Tengo que paginarla a la direccion fisica 0x00000000
+    83                                  
+    84                                    ;Primeros 10 bits = xx0100000000 = 100
+    85                                    ;Por 4 porque cuando el procesador lo toma como offset hace avanzar el "puntero" 4 bytes
+    86 00000177 C70500140000032000-       mov dword[INICIO_PAGE_DIRECTORY+0x100*4],INICIO_PAGE_TABLE_RAM+0x3
+    86 00000180 00                 
+    87                                    ;Lo que coloco es el INICIO_PAGE_TABLE_RAM y sus atributos a nivel directorio que se suman
+    88                                  
+    89                                    ;Segundos 10 bits = xx0000000000 = 000
+    90 00000181 C70500200000030000-       mov dword[INICIO_PAGE_TABLE_RAM+0x000*4],0x00000000+0x3
+    90 0000018A 00                 
+    91                                    ;Lo que coloco es la direccion fisica la que quiero colocar la base de los primeros 12 bits
+    92                                  
+    93                                    ;Como solo paginé una sola pagina tengo disponible desde 0x40000000 a 0x40000FFF direccionados a
+    94                                    ;0x00000000 a 0x00000FFF (Por eso la pila la pongo en 0x40000FFF+1=0x40001000)
+    95                                  
+    96                                    ;La direccion es 0xFFFF0000 = 1111111111.1111110000.000000000000 [10bits.10bits.12bits]
+    97                                    ;Primeros 10 bits = xx1111111111 = 3FF
+    98 0000018B C705FC1F0000033000-       mov dword[INICIO_PAGE_DIRECTORY+0x3FF*4],INICIO_PAGE_TABLE_ROM+0x3
+    98 00000194 00                 
+    99                                    ;Lo que coloco es el INICIO_PAGE_TABLE_ROM y sus atributos a nivel directorio que se suman
+   100                                  
+   101                                    ;Segundos 10 bits = xx1111110000 = 3F0
+   102                                    ;Tengo que llenar las tablas de rom que son 16, 16x4kb=64kb (FFFF)
+   103                                  
+   104                                    ;Base + indice * 4 (como siempre para avanzar de a 4 bytes)
+   105 00000195 BFC03F0000                mov edi,INICIO_PAGE_TABLE_ROM+0x3F0*4
+   106 0000019A B80300FFFF                mov eax,0xFFFF0000+0x3 ;Coloco la primer direccion de la ROM
+   107 0000019F B910000000                mov ecx, 16
+   108                                  
+   109                                  .ciclo_set_page_table_rom:
+   110 000001A4 8907                      mov [edi],eax
+   111 000001A6 83C704                    add edi,4 ;Me muevo al proximo offset que es 4 bytes
+   112 000001A9 0500100000                add eax,0x1000 ;la siguiente pagina esta 4kb adelante
+   113 000001AE 49                        dec ecx
+   114 000001AF 75F3                      jnz .ciclo_set_page_table_rom
+   115                                    ;cargo idt
+   116 000001B1 0F011D[29010000]          lidt  [img_idtr]
+   117                                    ;Configuro los pics
+   118 000001B8 E8(00000000)              call _pic_configure
+   119 000001BD E8(00000000)              call _pit_configure
+   120                                    ;aca tengo que activar la paginacion
+   121                                    ;Cargo cr3 en el inicio del directorio de paginas
+   122 000001C2 6687DB                    xchg bx,bx
+   123 000001C5 B800100000                mov eax,INICIO_PAGE_DIRECTORY
+   124 000001CA 0F22D8                    mov cr3,eax
+   125                                  
+   126                                    ;activo la paginacion con cr0
+   127 000001CD 0F20C0                    mov eax,cr0
+   128 000001D0 0D00000080                or eax,0x80000000
+   129 000001D5 0F22C0                    mov cr0,eax
+   130                                  
+   131                                    ;Tengo que cambiar la pila que no esta paginada
+   132 000001D8 BC00100040                mov esp,0x40001000;La dejo en la ultima posicion
+   133                                  
+   134                                    ;Le digo al pic que este habilitada la interrupcion del timer irq0
+   135 000001DD B0FE                      mov al,0xFE;Habilito irq 0
+   136 000001DF E621                      out 0x21,al
+   137                                  
+   138                                  
+   139 000001E1 FB                        sti ;A partir de este momento estan habilitadas las interrupciones
+   140 000001E2 EBFE                      jmp $
+   141                                  
+   142                                  _handler_timer:
+   143 000001E4 60                        pushad
+   144 000001E5 61                        popad
+   145 000001E6 CF                        iret
+   146                                  
+   147                                  section .nucleo
+   148                                  nucleo:
+   149 00000000 90                        nop
+   150                                  
+   151 00000001 C3                        ret

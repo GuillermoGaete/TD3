@@ -1,0 +1,226 @@
+Next at t=0
+(0) [0x0000fffffff0] f000:fff0 (unk. ctxt): mov ax, 0x0000            ; b80000
+Next at t=1
+(0) [0x0000fffffff3] f000:fff3 (unk. ctxt): jmp ax                    ; ffe0
+Next at t=2
+(0) [0x0000ffff0000] f000:0000 (unk. ctxt): jmp .+300 (0xffff012f)    ; e92c01
+Next at t=3
+(0) [0x0000ffff012f] f000:012f (unk. ctxt): mov eax, 0xfffffff0       ; 66b8f0ffffff
+Next at t=4
+(0) [0x0000ffff0135] f000:0135 (unk. ctxt): mov dword ptr ds:0x0000, eax ; 66a30000
+Next at t=5
+(0) [0x0000ffff0139] f000:0139 (unk. ctxt): cli                       ; fa
+Next at t=6
+(0) [0x0000ffff013a] f000:013a (unk. ctxt): lgdt cs:0x001b            ; 662e0f01161b00
+Next at t=7
+(0) [0x0000ffff0141] f000:0141 (unk. ctxt): mov eax, cr0              ; 0f20c0
+Next at t=8
+(0) [0x0000ffff0144] f000:0144 (unk. ctxt): or eax, 0x00000001        ; 6683c801
+c
+(0) Magic breakpoint
+Next at t=12462
+(0) [0x0000ffff01ca] 0010:00000000ffff01ca (unk. ctxt): mov eax, cr0              ; 0f20c0
+Next at t=12463
+(0) [0x0000ffff01cd] 0010:00000000ffff01cd (unk. ctxt): or eax, 0x80000000        ; 0d00000080
+Next at t=12464
+(0) [0x0000ffff01d2] 0010:00000000ffff01d2 (unk. ctxt): mov cr0, eax              ; 0f22c0
+Next at t=12465
+(0) [0x0000ffff01d5] 0010:00000000ffff01d5 (unk. ctxt): mov esp, 0x40001000       ; bc00100040
+Next at t=12466
+(0) [0x0000ffff01da] 0010:00000000ffff01da (unk. ctxt): mov al, 0xfe              ; b0fe
+infopag
+:2: syntax error at 'infopag'
+pag
+:3: syntax error at 'pag'
+bx_dbg_read_linear: physical address not available for linear 0x0000000000000000
+Next at t=12467
+(0) [0x0000ffff01dc] 0010:00000000ffff01dc (unk. ctxt): out 0x21, al              ; e621
+Next at t=12468
+(0) [0x0000ffff01de] 0010:00000000ffff01de (unk. ctxt): sti                       ; fb
+Next at t=12469
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+c
+Next at t=76108750
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108751
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108752
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108753
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108754
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108755
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108756
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108757
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108758
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108759
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108760
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108761
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108762
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108763
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108764
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108765
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108766
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108767
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108768
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108769
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108770
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108771
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108772
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108773
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108774
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108775
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108776
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108777
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108778
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108779
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108780
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108781
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108782
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108783
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108784
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108785
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108786
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108787
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108788
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108789
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108790
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108791
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108792
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+Next at t=76108793
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76113672
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+Next at t=76113673
+(0) [0x0000ffff01eb] 0010:00000000ffff01eb (unk. ctxt): mov ax, 0x0008            ; 66b80800
+Next at t=76113674
+(0) [0x0000ffff01ef] 0010:00000000ffff01ef (unk. ctxt): mov ds, ax                ; 8ed8
+Next at t=76113675
+(0) [0x0000ffff01f1] 0010:00000000ffff01f1 (unk. ctxt): inc byte ptr ds:0x40000000 ; 3efe0500000040
+Next at t=76113676
+(0) [0x0000ffff01f8] 0010:00000000ffff01f8 (unk. ctxt): mov al, 0x20              ; b020
+Next at t=76113677
+(0) [0x0000ffff01fa] 0010:00000000ffff01fa (unk. ctxt): out 0x20, al              ; e620
+Next at t=76113678
+(0) [0x0000ffff01fc] 0010:00000000ffff01fc (unk. ctxt): pop eax                   ; 58
+Next at t=76113679
+(0) [0x0000ffff01fd] 0010:00000000ffff01fd (unk. ctxt): mov ds, ax                ; 8ed8
+Next at t=76113680
+(0) [0x0000ffff01ff] 0010:00000000ffff01ff (unk. ctxt): popa                      ; 61
+Next at t=76113681
+(0) [0x0000ffff0200] 0010:00000000ffff0200 (unk. ctxt): iret                      ; cf
+Next at t=76113682
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76138672
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76163671
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76188672
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76213672
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76238674
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76263674
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76288674
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76313673
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76338674
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76363674
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76388676
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76413676
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76438676
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76463676
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76488676
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76513676
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+(0) Breakpoint 1, 0x00000000ffff01ea in ?? ()
+Next at t=76538678
+(0) [0x0000ffff01ea] 0010:00000000ffff01ea (unk. ctxt): push eax                  ; 50
+c
+Next at t=100364054
+(0) [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe
+(0).[100364054] [0x0000ffff01df] 0010:00000000ffff01df (unk. ctxt): jmp .-2 (0xffff01df)      ; ebfe

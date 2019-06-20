@@ -1,0 +1,68 @@
+
+Configuración de la Memoria
+
+Nombre           Origen             Longitud           Atributos
+ram              0x0000000000000000 0x00000000ffff0000 xrw
+rom              0x00000000ffff0000 0x0000000000010000 xr
+rom_reset        0x00000000fffffff0 0x0000000000000010 xr
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Guión del enlazador y mapa de memoria
+
+                0x000000001fffb000                __INICIO_PILA = 0x1fffb000
+                0x0000000000004000                __SIZE_PILA = 0x4000
+                0x000000001ffff000                __FIN_PILA = (__INICIO_PILA + __SIZE_PILA)
+                0x00000000fffffff0                __INICIO_RESET = 0xfffffff0
+                0x00000000ffff0000                __INICIO_ROM = 0xffff0000
+                0x0000000000000000                __INICIO_RAM = 0x0
+
+.iplt           0x0000000000000000        0x0
+ .iplt          0x0000000000000000        0x0 copy.elf
+
+.init           0x00000000ffff0000      0x25e
+ *(.init)
+ .init          0x00000000ffff0000      0x201 tp_01_05.elf
+ .init          0x00000000ffff0201       0x28 pic.elf
+                0x00000000ffff0201                _pic_configure
+ .init          0x00000000ffff0229       0x35 pit.elf
+                0x00000000ffff0229                _pit_configure
+
+.rutinas        0x0000000000000000        0xf dirección de carga 0x00000000ffff025e
+                0x0000000000000000                __INICIO_RUTINAS_RAM = .
+                0x00000000ffff025e                __INICIO_RUTINAS_ROM = LOADADDR (.rutinas)
+                0x00000000ffff025e                __INICIO_COPY_EN_RUTINAS_ROM = __INICIO_RUTINAS_ROM
+                0x0000000000000000                __INICIO_COPY_EN_RUTINAS_RAM = .
+ copy.elf(.copy)
+ .copy          0x0000000000000000        0xf copy.elf
+ *(.rutinas)
+                0x000000000000000f                __LONGITUD_NUCLEO = (. - __INICIO_RUTINAS_RAM)
+
+.nucleo         0x0000000000300000        0x5 dirección de carga 0x00000000ffff026d
+                0x0000000000300000                __INICIO_NUCLEO_RAM = .
+                0x00000000ffff026d                __INICIO_NUCLEO_ROM = LOADADDR (.nucleo)
+ *(.nucleo)
+ .nucleo        0x0000000000300000        0x5 tp_01_05.elf
+                0x0000000000000005                __LONGITUD_RUTINAS = 0x5
+
+.reset          0x00000000fffffff0       0x10
+ *(.reset)
+ .reset         0x00000000fffffff0       0x10 tp_01_05.elf
+LOAD tp_01_05.elf
+LOAD copy.elf
+LOAD pic.elf
+LOAD pit.elf
+OUTPUT(tp_01_05_rom.elf elf32-i386)
+
+.got            0x0000000100000000        0x0
+ .got           0x0000000100000000        0x0 copy.elf
+
+.got.plt        0x0000000100000000        0x0
+ .got.plt       0x0000000100000000        0x0 copy.elf
+
+.igot.plt       0x0000000100000000        0x0
+ .igot.plt      0x0000000100000000        0x0 copy.elf
+
+.rel.dyn        0x0000000100000000        0x0
+ .rel.got       0x0000000100000000        0x0 copy.elf
+ .rel.iplt      0x0000000100000000        0x0 copy.elf
+ .rel.init      0x0000000100000000        0x0 copy.elf
