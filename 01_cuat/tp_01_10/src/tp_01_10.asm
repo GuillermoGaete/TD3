@@ -36,6 +36,7 @@ EXTERN __LONGITUD_HANDLERS
 
 EXTERN __INICIO_SET_IDT_HANDLER_EN_NUCLEO_RAM
 
+EXTERN __INICIO_PILA
 EXTERN __FIN_PILA
 
 EXTERN __SYSTEM_TABLES
@@ -50,6 +51,9 @@ EXTERN _pit_configure
 INICIO_PAGE_DIRECTORY EQU 0x1000 ;Las pongo en cualquier lugar
 INICIO_PAGE_TABLE_RAM EQU 0x3000 ;Separado FFF
 INICIO_PAGE_TABLE_ROM EQU 0x6000
+INICIO_PAGE_TABLE_PILA EQU 0x9000
+
+EXTERN __INICIO_PAGINATION_HELPERS_RAM
 
 section .reset
 arranque:
@@ -79,10 +83,10 @@ modo_proteg:
   mov ss,ax ;defino ss y esp dentro del segmento de datos
   mov esp,__FIN_PILA
 
-
+  ;Copio todo lo que tengo que copiar de rom a RAM
+  call _copy_from_rom_to_ram
 
   ;Borro la memoria, en donde voy a poner mis tablas
-
   mov edi,INICIO_PAGE_DIRECTORY
   mov ecx,INICIO_PAGE_TABLE_ROM/4
   xor eax,eax
@@ -113,16 +117,18 @@ modo_proteg:
     ;Segundos 10 bits maximos = xx00.1110.0000 = 0E0 [En decimal son 16*15=240]
 
   ;Por lo tanto son 2 entradas en el directorio de paginas que tienen que apuntar a las tablas de paginas
+  xchg bx,bx
   mov dword[INICIO_PAGE_DIRECTORY+0x000*4],INICIO_PAGE_TABLE_RAM+0x3
   mov dword[INICIO_PAGE_DIRECTORY+0x001*4],INICIO_PAGE_TABLE_RAM+0x400*4+0x3
 
   mov ecx,0x3FF
   add ecx,0x0E0
-  add ecx,1
+  add ecx,2
 
   ;Completo la primeras paginas de RAM y las segundas
   mov edi,INICIO_PAGE_TABLE_RAM
   mov eax,0x00000000+0x3
+
 ciclo_llenado_tablas_ram:
   mov [edi],eax
   add edi,4 ;Me muevo al proximo offset que es 4 bytes
@@ -130,26 +136,45 @@ ciclo_llenado_tablas_ram:
   dec ecx
   jnz ciclo_llenado_tablas_ram
 
-  ;Ahora pagino la rom
-  ;La direccion es 0xFFFF0000 = 1111111111.1111110000.000000000000 [10bits.10bits.12bits]
-  ;Primeros 10 bits = xx1111111111 = 3FF
-  mov dword[INICIO_PAGE_DIRECTORY+0x3FF*4],INICIO_PAGE_TABLE_ROM+0x3
-  ;Lo que coloco es el INICIO_PAGE_TABLE_ROM y sus atributos a nivel directorio que se suman
+  ;Ahora configuro la paginacion de la ROM
+  push dword 0xFFFF0000 ;Direccion lineal inicial
+  push dword 0xFFFFFFFF ;Direccion lineal final
+  push dword 0xFFFF0000 ;Direcccion fisica inicial
+  push dword INICIO_PAGE_TABLE_ROM
+  push dword INICIO_PAGE_DIRECTORY
+  call __INICIO_PAGINATION_HELPERS_RAM
+  pop eax
+  pop eax
+  pop eax
+  pop eax
+  pop eax
 
-  ;Segundos 10 bits = xx1111110000 = 3F0
-  ;Tengo que llenar las tablas de rom que son 16, 16x4kb=64kb (FFFF)
+  push dword 0x00000000 ;Direccion lineal inicial
+  push dword 0x004E0000 ;Direccion lineal final
+  push dword 0x00000000 ;Direcccion fisica inicial
+  push dword INICIO_PAGE_TABLE_RAM ;En que lugar esta la tabla para esta region
+  push dword INICIO_PAGE_DIRECTORY
+  xchg bx,bx
+  call __INICIO_PAGINATION_HELPERS_RAM
+  pop eax
+  pop eax
+  pop eax
+  pop eax
+  pop eax
 
-  ;Base + indice * 4 (como siempre para avanzar de a 4 bytes)
-  mov edi,INICIO_PAGE_TABLE_ROM+0x3F0*4
-  mov eax,0xFFFF0000+0x3 ;Coloco la primer direccion de la ROM
-  mov ecx,0x10
+  push dword __INICIO_PILA ;Direccion lineal inicial
+  push dword __FIN_PILA ;Direccion lineal inicial
+  push dword __INICIO_PILA ;Direccion lineal inicial
+  push dword INICIO_PAGE_TABLE_PILA ;En que lugar esta la tabla para esta region
+  push dword INICIO_PAGE_DIRECTORY
+  call __INICIO_PAGINATION_HELPERS_RAM
+  pop eax
+  pop eax
+  pop eax
+  pop eax
+  pop eax
 
-.ciclo_set_page_table_rom:
-  mov [edi],eax
-  add edi,4 ;Me muevo al proximo offset que es 4 bytes
-  add eax,0x1000 ;la siguiente pagina esta 4kb adelante
-  dec ecx
-  jnz .ciclo_set_page_table_rom
+  xchg bx,bx
 
   mov eax,INICIO_PAGE_DIRECTORY
   mov cr3,eax
@@ -161,13 +186,10 @@ ciclo_llenado_tablas_ram:
 
   ;TODO corregir esto, hay que paginar la pila correctamente
   ;Por el momento con esto funciona
-  mov esp,0x00400000
+  mov esp,__INICIO_PILA
 
   xor edx,edx
   mov [__CURRENT_TABLE_INDEX],edx
-
-  ;Copio todo lo que tengo que copiar de rom a RAM
-  call _copy_from_rom_to_ram
 
   ;Antes de cargar la idt, lo que tengo que hacer es escribir en cada vector los
   ;handlers que corresponden, para esto hago
@@ -367,3 +389,116 @@ pop eax
 pop eax
 
 ret
+
+set_rom_pagination:
+
+pushad
+xor eax,eax
+xor ebx,ebx
+xor ecx,ecx
+xor edx,edx
+
+is_identity_map:;init eax, finish ebx
+
+mov eax,0xFFFF0000
+mov ebx,0xFFFFFFFF
+mov ecx,ebx
+sub ecx,eax
+add ecx,1
+
+mov eax,1 ;Si tengo menos de 4096 direcciones entonces tengo una sola pagina
+cmp ecx,4096
+jle finished_number_page_compute
+
+xor eax,eax
+xor edx,edx
+mov eax,ecx
+mov ecx,4096
+
+div ecx
+cmp edx,0
+je finished_number_page_compute
+add eax,1
+
+finished_number_page_compute:
+mov edx,eax ;En edx tengo la cantidad de paginas
+push edx ;Lo pusheo ya que lo voy a usar mas adelante
+;Voy a computar la cantidad de directorios
+;El maximo valor es 1024 porque son 10 bits
+mov ecx,edx ;Lo muevo a ecx porque edx se usa en la division
+mov eax,1 ;Si tengo menos de 1024 direcciones entonces tengo una entrada en el directorio
+cmp ecx,1024
+jle finished_number_directory_compute
+
+xor eax,eax
+xor edx,edx
+mov eax,ecx
+mov ecx,1024
+
+div ecx
+cmp edx,0
+je finished_number_directory_compute
+add eax,1
+
+finished_number_directory_compute:
+mov edx,eax ;En edx tengo la cantidad de paginas
+
+mov eax,0xFFFF0000
+mov ebx,0
+ciclo_directorio:
+  push eax ;Guardo la direccion
+  push ebx  ;Guardo el indice actual
+
+  ror eax,22;Dejo los 10msb en la parte baja
+  and eax,0x3FF;And con 0x1111111111
+
+  mov ecx,INICIO_PAGE_DIRECTORY
+  rol eax,2;Multiplico por 4
+
+  add ecx,eax ;Tengo a direccion a donde quiero escribir
+  mov eax,0x400
+  mul ebx
+
+  mov ebx,INICIO_PAGE_TABLE_ROM
+  add ebx,eax
+  add ebx,0x3
+
+  mov [ecx],ebx
+
+  pop ebx ;Saco el indice actual
+  pop eax ;Saco la direccion despues de operar con ella
+  add eax,0x1000000 ;La aumento la direccion 0x1000000 que es el maximo de un directorio
+  add ebx,1;La aumento en el indice 1
+
+  cmp ebx,edx
+  jl ciclo_directorio
+
+
+pop edx ;Cantidad de paginas
+
+mov eax,0xFFFF0000
+ror eax,12;Dejo los 10msb en la parte baja
+and eax,0x3FF;And con 0x1111111111
+
+rol eax,2;Lo multiplico por 4
+
+add eax,INICIO_PAGE_TABLE_ROM
+mov ebx,0
+
+mov ecx,0xFFFF0000+0x3
+ciclo_llenado_page_table:
+  mov [eax],ecx
+  add eax,4 ;Me muevo al proximo offset que es 4 bytes(Es un offset en la tabla de paginas)
+  add ecx,0x1000;la siguiente pagina esta 4kb adelante en direcciones fisicas
+  add ebx,1
+
+  cmp ebx,edx
+  jl ciclo_llenado_page_table
+
+is_not_identity_map:
+popad
+ret
+
+ecx_plus:
+  add ecx,1
+  ret

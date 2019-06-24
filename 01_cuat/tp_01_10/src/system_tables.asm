@@ -1,4 +1,3 @@
-
 section .system_tables
 USE16
 gdt:
