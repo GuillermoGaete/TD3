@@ -167,7 +167,7 @@ modo_proteg:
   mov cr0,eax
 
   xchg bx,bx
-  mov esp,0xFFF00000
+  mov esp,__FIN_PILA
 
   xor edx,edx
   mov [__CURRENT_TABLE_INDEX],edx
