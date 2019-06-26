@@ -3,12 +3,12 @@ EXTERN __FLAG_TIMER
 EXTERN __INICIO_TABLA_DE_DIGITOS
 EXTERN __CURRENT_TABLE_INDEX
 
+EXTERN __PRINT_NUMBER
+
 USE32
 section .data
 _acum dd 0x00000001
 section .bss
-
-
 
 section .text
   mov eax,[__FLAG_TIMER]
@@ -45,40 +45,22 @@ ciclo_suma:
   ;Muestro en pantalla
   mov eax,0
   ;Acumulo en __ACUM
-  xchg bx,bx
   mov edx,[_acum]
   add edx,ecx
   mov [_acum],edx
-  mov ecx,edx
-  ;en ecx tengo el numero a mostrar
-  MOV ESI, 0xb8000   ; Puntero
 
-ciclo_mostrar:
-  rol ecx,4
-  push ecx
-  and ecx,0x0000000F
-  call return_ascii
-  ;Retorna en ecx el valor a mostar
-  ;Tengo que enviar el numero y retornar de alguna forma el codigo return_ascii
-  MOV [ESI], cl  ; Escribo en pantalla
-  MOV BYTE [ESI+1], 0x07
-  ADD ESI, 2  ; Incremento el puntero
+  mov ecx,edx
+
+  push ecx ;En ecx tengo el numero a mostrar
+  push 0x2 ;Fila donde muestro el numero
+  call __PRINT_NUMBER
   pop ecx
-  add eax,1
-  cmp eax,7
-  jle ciclo_mostrar
+  pop ecx
 
   mov eax,0
   mov [__CURRENT_TABLE_INDEX],eax
 
 return:
+  xchg bx,bx
   hlt
   ret ;Para volver
-
-return_ascii:
-  add ecx,48
-  cmp ecx,58
-  jl finish_return_ascii
-  add ecx,7
-finish_return_ascii:
-  ret

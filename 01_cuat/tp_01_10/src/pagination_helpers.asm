@@ -2,8 +2,8 @@ section .pagination_helpers
 USE32
 ;[esp] ;Direccion de retorno
 
-;[esp+4] ;INICIO_PAGE_DIRECTORY
-;[esp+8] ;INICIO_PAGE_TABLE_ROM
+;[esp+4] ;Inicio del directorio de tablas
+;[esp+8] ;Inicio de la tabla de paginas
 
 ;[esp+12] ;Direccion fisica inicial
 ;[esp+16] ;Direccion lineal final
@@ -65,8 +65,8 @@ push ebx
 
 ;[esp+8] ;Direccion de retorno
 
-;[esp+12] ;INICIO_PAGE_DIRECTORY
-;[esp+16] ;INICIO_PAGE_TABLE
+;[esp+12] ;Inicio del directorio de tablas
+;[esp+16] ;Inicio de la tabla de paginas
 
 ;[esp+20] ;Direccion fisica inicial
 ;[esp+24] ;Direccion lineal final
@@ -112,8 +112,8 @@ push edi
 
 ;[esp+16] ;Direccion de retorno
 
-;[esp+20] ;INICIO_PAGE_DIRECTORY
-;[esp+24] ;INICIO_PAGE_TABLE
+;[esp+20] ;Inicio del directorio de tablas
+;[esp+24] ;Inicio de la tabla de paginas
 
 ;[esp+28] ;Direccion fisica inicial
 ;[esp+32] ;Direccion lineal final

@@ -74,6 +74,10 @@ SECTIONS
 		invalidate_idt.elf(.invalidate_idt); /*Solamente la que esta en invalidate_idt.elf*/
 		__INICIO_PAGINATION_HELPERS_RAM = .;
 		pagination_helpers.elf(.pagination_helpers);
+		__PRINT_NUMBER = .;
+		video_helpers.elf(.print_number);
+		__PRINT_TEXT = .;
+		video_helpers.elf(.print_text);		
 		*(.nucleo);  /*Voy a colocar todo lo que encuentre en sections nucleo en los archivos de entrada*/
 		__FIN_NUCLEO_RAM = .;
 		/*Calculo el tamanio de mi seccion rutina como la direccion VMA final menos la inicial*/

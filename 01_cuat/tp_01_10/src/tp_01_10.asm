@@ -45,8 +45,13 @@ EXTERN __SYSTEM_TABLES_LONG
 
 EXTERN __CURRENT_TABLE_INDEX
 
+EXTERN __PRINT_TEXT
+
 EXTERN _pic_configure
 EXTERN _pit_configure
+
+TP_MESSAGE  DB "TP 10: Paginacion basica - Isaac Guillermo Gaete"
+LONG_TP_MESSAGE EQU $-TP_MESSAGE
 
 INICIO_PAGE_DIRECTORY EQU 0x1000 ;Las pongo en cualquier lugar
 INICIO_PAGE_TABLE_RAM EQU 0x3000 ;Separado FFF
@@ -116,26 +121,6 @@ modo_proteg:
     ;Segundos 10 bits minimos = xx00.0000.0000 = 000
     ;Segundos 10 bits maximos = xx00.1110.0000 = 0E0 [En decimal son 16*15=240]
 
-  ;Por lo tanto son 2 entradas en el directorio de paginas que tienen que apuntar a las tablas de paginas
-  xchg bx,bx
-  mov dword[INICIO_PAGE_DIRECTORY+0x000*4],INICIO_PAGE_TABLE_RAM+0x3
-  mov dword[INICIO_PAGE_DIRECTORY+0x001*4],INICIO_PAGE_TABLE_RAM+0x400*4+0x3
-
-  mov ecx,0x3FF
-  add ecx,0x0E0
-  add ecx,2
-
-  ;Completo la primeras paginas de RAM y las segundas
-  mov edi,INICIO_PAGE_TABLE_RAM
-  mov eax,0x00000000+0x3
-
-ciclo_llenado_tablas_ram:
-  mov [edi],eax
-  add edi,4 ;Me muevo al proximo offset que es 4 bytes
-  add eax,0x1000 ;la siguiente pagina esta 4kb adelante
-  dec ecx
-  jnz ciclo_llenado_tablas_ram
-
   ;Ahora configuro la paginacion de la ROM
   push dword 0xFFFF0000 ;Direccion lineal inicial
   push dword 0xFFFFFFFF ;Direccion lineal final
@@ -154,7 +139,6 @@ ciclo_llenado_tablas_ram:
   push dword 0x00000000 ;Direcccion fisica inicial
   push dword INICIO_PAGE_TABLE_RAM ;En que lugar esta la tabla para esta region
   push dword INICIO_PAGE_DIRECTORY
-  xchg bx,bx
   call __INICIO_PAGINATION_HELPERS_RAM
   pop eax
   pop eax
@@ -174,19 +158,16 @@ ciclo_llenado_tablas_ram:
   pop eax
   pop eax
 
-  xchg bx,bx
-
   mov eax,INICIO_PAGE_DIRECTORY
   mov cr3,eax
 
-  ;activo la paginacion con cr0
+  ;Activo la paginacion con cr0
   mov eax,cr0
   or eax,0x80000000
   mov cr0,eax
 
-  ;TODO corregir esto, hay que paginar la pila correctamente
-  ;Por el momento con esto funciona
-  mov esp,__INICIO_PILA
+  xchg bx,bx
+  mov esp,0xFFF00000
 
   xor edx,edx
   mov [__CURRENT_TABLE_INDEX],edx
@@ -206,6 +187,13 @@ ciclo_llenado_tablas_ram:
   ;A partir de este momento estan habilitadas las interrupciones
   sti
 
+  push  dword TP_MESSAGE
+  push  dword LONG_TP_MESSAGE
+  push 0x0  ;Fila
+  call __PRINT_TEXT
+  pop eax
+  pop eax
+  pop eax
 
 main:
   call __INICIO_TEXT_TAREA_1_RAM
