@@ -1,4 +1,4 @@
-EXTERN __FLAG_TIMER
+EXTERN __FLAG_TIMER_BASE
 
 EXTERN __INICIO_TABLA_DE_DIGITOS
 EXTERN __CURRENT_TABLE_INDEX
@@ -11,14 +11,14 @@ _acum dd 0x00000001
 section .bss
 
 section .text
-  mov eax,[__FLAG_TIMER]
+  mov eax,[__FLAG_TIMER_BASE]
   and eax,0x00000001
   cmp eax,1
   jne return
   ;Si estoy aca es porque el flag del timer se levanto, lo bajo
-  mov eax,[__FLAG_TIMER]
+  mov eax,[__FLAG_TIMER_BASE]
   and eax,0xFFFFFFFE
-  mov [__FLAG_TIMER],eax
+  mov [__FLAG_TIMER_BASE],eax
 
   mov eax,__INICIO_TABLA_DE_DIGITOS
   mov ebx,[__CURRENT_TABLE_INDEX]
@@ -52,7 +52,7 @@ ciclo_suma:
   mov ecx,edx
 
   push ecx ;En ecx tengo el numero a mostrar
-  push 0x2 ;Fila donde muestro el numero
+  push 0x1 ;Fila donde muestro el numero
   call __PRINT_NUMBER
   pop ecx
   pop ecx
@@ -61,6 +61,5 @@ ciclo_suma:
   mov [__CURRENT_TABLE_INDEX],eax
 
 return:
-  xchg bx,bx
   hlt
   ret ;Para volver

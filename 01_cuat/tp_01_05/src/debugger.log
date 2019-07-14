@@ -17,95 +17,22 @@ Next at t=7
 Next at t=8
 (0) [0x0000ffff0032] f000:0000000000000032 (unk. ctxt): jmpf 0x0010:ffff003a      ; 66ea3a00ffff1000
 Next at t=9
-(0) [0x0000ffff003a] 0010:00000000ffff003a (unk. ctxt): mov ax, 0x0008            ; 66b80800
+(0) [0x0000ffff003a] 0010:00000000ffff003a (unk. ctxt): mov ax, 0x000b            ; 66b80b00
 Next at t=10
 (0) [0x0000ffff003e] 0010:00000000ffff003e (unk. ctxt): mov ds, ax                ; 8ed8
+(0).[10] [0x0000ffff003e] 0010:00000000ffff003e (unk. ctxt): mov ds, ax                ; 8ed8
 Next at t=11
-(0) [0x0000ffff0040] 0010:00000000ffff0040 (unk. ctxt): mov ss, ax                ; 8ed0
+(0) [0x0000fffffff0] f000:fff0 (unk. ctxt): mov ax, 0x0000            ; b80000
 Next at t=12
-(0) [0x0000ffff0042] 0010:00000000ffff0042 (unk. ctxt): mov esp, 0x1ffff000       ; bc00f0ff1f
+(0) [0x0000fffffff3] f000:fff3 (unk. ctxt): jmp ax                    ; ffe0
 Next at t=13
-(0) [0x0000ffff0047] 0010:00000000ffff0047 (unk. ctxt): push 0xffff007c           ; 687c00ffff
+(0) [0x0000ffff0000] f000:0000 (unk. ctxt): jmp .+30 (0xffff0020)     ; eb1e
 Next at t=14
-(0) [0x0000ffff004c] 0010:00000000ffff004c (unk. ctxt): push 0x00000000           ; 6800000000
+(0) [0x0000ffff0020] f000:0020 (unk. ctxt): cli                       ; fa
 Next at t=15
-(0) [0x0000ffff0051] 0010:00000000ffff0051 (unk. ctxt): push 0x00000016           ; 6816000000
+(0) [0x0000ffff0021] f000:0021 (unk. ctxt): lgdt cs:0x001a            ; 662e0f01161a00
 Next at t=16
-(0) [0x0000ffff0056] 0010:00000000ffff0056 (unk. ctxt): call .+33 (0xffff007c)    ; e821000000
+(0) [0x0000ffff0028] f000:0028 (unk. ctxt): mov eax, cr0              ; 0f20c0
 Next at t=17
-(0) [0x0000ffff007c] 0010:00000000ffff007c (unk. ctxt): mov ecx, dword ptr ss:[esp+4] ; 8b4c2404
-Next at t=18
-(0) [0x0000ffff0080] 0010:00000000ffff0080 (unk. ctxt): mov edi, dword ptr ss:[esp+8] ; 8b7c2408
-Next at t=19
-(0) [0x0000ffff0084] 0010:00000000ffff0084 (unk. ctxt): mov esi, dword ptr ss:[esp+12] ; 8b74240c
-Next at t=20
-(0) [0x0000ffff0088] 0010:00000000ffff0088 (unk. ctxt): mov al, byte ptr ds:[esi] ; 8a06
-Next at t=21
-(0) [0x0000ffff008a] 0010:00000000ffff008a (unk. ctxt): mov byte ptr ds:[edi], al ; 8807
-Next at t=22
-(0) [0x0000ffff008c] 0010:00000000ffff008c (unk. ctxt): inc esi                   ; 46
-Next at t=23
-(0) [0x0000ffff008d] 0010:00000000ffff008d (unk. ctxt): inc edi                   ; 47
-Next at t=24
-(0) [0x0000ffff008e] 0010:00000000ffff008e (unk. ctxt): dec ecx                   ; 49
-Next at t=25
-(0) [0x0000ffff008f] 0010:00000000ffff008f (unk. ctxt): jnz .-9 (0xffff0088)      ; 75f7
-Next at t=26
-(0) [0x0000ffff0088] 0010:00000000ffff0088 (unk. ctxt): mov al, byte ptr ds:[esi] ; 8a06
-Next at t=27
-(0) [0x0000ffff008a] 0010:00000000ffff008a (unk. ctxt): mov byte ptr ds:[edi], al ; 8807
-Next at t=28
-(0) [0x0000ffff008c] 0010:00000000ffff008c (unk. ctxt): inc esi                   ; 46
-Next at t=29
-(0) [0x0000ffff008d] 0010:00000000ffff008d (unk. ctxt): inc edi                   ; 47
-Next at t=30
-(0) [0x0000ffff008e] 0010:00000000ffff008e (unk. ctxt): dec ecx                   ; 49
-c
-(0) Breakpoint 1, 0x00000000ffff0091 in ?? ()
-Next at t=152
-(0) [0x0000ffff0091] 0010:00000000ffff0091 (unk. ctxt): ret                       ; c3
-Next at t=153
-(0) [0x0000ffff005b] 0010:00000000ffff005b (unk. ctxt): pop eax                   ; 58
-Next at t=154
-(0) [0x0000ffff005c] 0010:00000000ffff005c (unk. ctxt): pop eax                   ; 58
-Next at t=155
-(0) [0x0000ffff005d] 0010:00000000ffff005d (unk. ctxt): pop eax                   ; 58
-Next at t=156
-(0) [0x0000ffff005e] 0010:00000000ffff005e (unk. ctxt): push 0xffff0092           ; 689200ffff
-Next at t=157
-(0) [0x0000ffff0063] 0010:00000000ffff0063 (unk. ctxt): push 0x00300000           ; 6800003000
-Next at t=158
-(0) [0x0000ffff0068] 0010:00000000ffff0068 (unk. ctxt): push 0x00000005           ; 6805000000
-c
-(0) Magic breakpoint
-Next at t=200
-(0) [0x000000300004] 0010:0000000000300004 (unk. ctxt): ret                       ; c3
-Next at t=201
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-Next at t=202
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-Next at t=203
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-Next at t=204
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-Next at t=205
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-Next at t=206
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-Next at t=207
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-Next at t=208
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-Next at t=209
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-Next at t=210
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-Next at t=211
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-Next at t=212
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-Next at t=213
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-Next at t=214
-(0) [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
-(0).[214] [0x0000ffff007a] 0010:00000000ffff007a (unk. ctxt): jmp .-2 (0xffff007a)      ; ebfe
+(0) [0x0000ffff002b] f000:002b (unk. ctxt): or eax, 0x00000001        ; 6683c801
+(0).[17] [0x0000ffff002b] f000:002b (unk. ctxt): or eax, 0x00000001        ; 6683c801

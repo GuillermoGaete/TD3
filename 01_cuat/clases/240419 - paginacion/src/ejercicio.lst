@@ -108,7 +108,7 @@
    104                                    ;Base + indice * 4 (como siempre para avanzar de a 4 bytes)
    105 00000195 BFC03F0000                mov edi,INICIO_PAGE_TABLE_ROM+0x3F0*4
    106 0000019A B80300FFFF                mov eax,0xFFFF0000+0x3 ;Coloco la primer direccion de la ROM
-   107 0000019F B910000000                mov ecx, 16
+   107 0000019F B90F000000                mov ecx,0xF
    108                                  
    109                                  .ciclo_set_page_table_rom:
    110 000001A4 8907                      mov [edi],eax
@@ -116,40 +116,41 @@
    112 000001A9 0500100000                add eax,0x1000 ;la siguiente pagina esta 4kb adelante
    113 000001AE 49                        dec ecx
    114 000001AF 75F3                      jnz .ciclo_set_page_table_rom
-   115                                    ;cargo idt
-   116 000001B1 0F011D[29010000]          lidt  [img_idtr]
-   117                                    ;Configuro los pics
-   118 000001B8 E8(00000000)              call _pic_configure
-   119 000001BD E8(00000000)              call _pit_configure
-   120                                    ;aca tengo que activar la paginacion
-   121                                    ;Cargo cr3 en el inicio del directorio de paginas
-   122 000001C2 6687DB                    xchg bx,bx
-   123 000001C5 B800100000                mov eax,INICIO_PAGE_DIRECTORY
-   124 000001CA 0F22D8                    mov cr3,eax
-   125                                  
-   126                                    ;activo la paginacion con cr0
-   127 000001CD 0F20C0                    mov eax,cr0
-   128 000001D0 0D00000080                or eax,0x80000000
-   129 000001D5 0F22C0                    mov cr0,eax
-   130                                  
-   131                                    ;Tengo que cambiar la pila que no esta paginada
-   132 000001D8 BC00100040                mov esp,0x40001000;La dejo en la ultima posicion
-   133                                  
-   134                                    ;Le digo al pic que este habilitada la interrupcion del timer irq0
-   135 000001DD B0FE                      mov al,0xFE;Habilito irq 0
-   136 000001DF E621                      out 0x21,al
-   137                                  
+   115                                  
+   116                                    ;cargo idt
+   117 000001B1 0F011D[29010000]          lidt  [img_idtr]
+   118                                    ;Configuro los pics
+   119 000001B8 E8(00000000)              call _pic_configure
+   120 000001BD E8(00000000)              call _pit_configure
+   121                                    ;aca tengo que activar la paginacion
+   122                                    ;Cargo cr3 en el inicio del directorio de paginas
+   123 000001C2 6687DB                    xchg bx,bx
+   124 000001C5 B800100000                mov eax,INICIO_PAGE_DIRECTORY
+   125 000001CA 0F22D8                    mov cr3,eax
+   126                                  
+   127                                    ;activo la paginacion con cr0
+   128 000001CD 0F20C0                    mov eax,cr0
+   129 000001D0 0D00000080                or eax,0x80000000
+   130 000001D5 0F22C0                    mov cr0,eax
+   131                                  
+   132                                    ;Tengo que cambiar la pila que no esta paginada
+   133 000001D8 BC00100040                mov esp,0x40001000;La dejo en la ultima posicion
+   134                                  
+   135                                    ;Le digo al pic que este habilitada la interrupcion del timer irq0
+   136 000001DD B0FE                      mov al,0xFE;Habilito irq 0
+   137 000001DF E621                      out 0x21,al
    138                                  
-   139 000001E1 FB                        sti ;A partir de este momento estan habilitadas las interrupciones
-   140 000001E2 EBFE                      jmp $
-   141                                  
-   142                                  _handler_timer:
-   143 000001E4 60                        pushad
-   144 000001E5 61                        popad
-   145 000001E6 CF                        iret
-   146                                  
-   147                                  section .nucleo
-   148                                  nucleo:
-   149 00000000 90                        nop
-   150                                  
-   151 00000001 C3                        ret
+   139                                  
+   140 000001E1 FB                        sti ;A partir de este momento estan habilitadas las interrupciones
+   141 000001E2 EBFE                      jmp $
+   142                                  
+   143                                  _handler_timer:
+   144 000001E4 60                        pushad
+   145 000001E5 61                        popad
+   146 000001E6 CF                        iret
+   147                                  
+   148                                  section .nucleo
+   149                                  nucleo:
+   150 00000000 90                        nop
+   151                                  
+   152 00000001 C3                        ret

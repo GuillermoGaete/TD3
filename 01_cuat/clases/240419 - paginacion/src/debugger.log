@@ -6,10 +6,9 @@ Next at t=12307
 (0) [0x0000ffff0177] 0010:00000000ffff0177 (unk. ctxt): mov dword ptr ds:0x00001400, 0x00002003 ; c7050014000003200000
 c
 (0) Magic breakpoint
-Next at t=12461
+Next at t=12456
 (0) [0x0000ffff01c5] 0010:00000000ffff01c5 (unk. ctxt): mov eax, 0x00001000       ; b800100000
 c
-(0) Breakpoint 1, 0x00000000ffff01e1 in ?? ()
-Next at t=12469
-(0) [0x0000ffff01e1] 0010:00000000ffff01e1 (unk. ctxt): sti                       ; fb
-(0).[12469] [0x0000ffff01e1] 0010:00000000ffff01e1 (unk. ctxt): sti                       ; fb
+Next at t=20486250
+(0) [0x0000ffff01e2] 0010:00000000ffff01e2 (unk. ctxt): jmp .-2 (0xffff01e2)      ; ebfe
+(0).[20486250] [0x0000ffff01e2] 0010:00000000ffff01e2 (unk. ctxt): jmp .-2 (0xffff01e2)      ; ebfe

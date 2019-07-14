@@ -104,8 +104,8 @@ modo_proteg:
   ;Base + indice * 4 (como siempre para avanzar de a 4 bytes)
   mov edi,INICIO_PAGE_TABLE_ROM+0x3F0*4
   mov eax,0xFFFF0000+0x3 ;Coloco la primer direccion de la ROM
-  mov ecx, 16
-
+  mov ecx,0xF
+  mov ecx,1 
 .ciclo_set_page_table_rom:
   mov [edi],eax
   add edi,4 ;Me muevo al proximo offset que es 4 bytes
@@ -128,6 +128,7 @@ modo_proteg:
   mov eax,cr0
   or eax,0x80000000
   mov cr0,eax
+
 
   ;Tengo que cambiar la pila que no esta paginada
   mov esp,0x40001000;La dejo en la ultima posicion

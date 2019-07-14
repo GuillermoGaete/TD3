@@ -1,9 +1,19 @@
+GLOBAL __PRINT_NUMBER
+GLOBAL __PRINT_TEXT
+
 USE32
+section .data
+
 BUFFER_VIDEO EQU 0xb8000
 DEFAULT_MESSAGE  DB "El numero acumulado es:"
 LONG_DEFAULT_MESSAGE EQU $-DEFAULT_MESSAGE
 
-section .print_number
+section .bss
+fila resb 4
+columna resb 4
+
+section .text
+__PRINT_NUMBER:
 ;[esp] ;Direccion de retorno
 
 ;[esp+4] ;Fila en donde mostar el numero
@@ -12,7 +22,7 @@ section .print_number
 ;en ecx tengo el numero a mostrar
 mov ecx,[esp+8]
 mov ebx,[esp+4];Fila
-mov eax,80
+mov eax,160
 xor edx,edx
 mul ebx
 
@@ -63,27 +73,36 @@ finish_return_ascii:
   ret
 
 
-section .print_text
-;[esp] ;Direccion de retorno
 
-;[esp+4] ;Fila en donde mostar el texto
-;[esp+8] ;Longitud del texto
-;[esp+12] ;Direccion de inicio del texto
-print_text:
-mov ebx,[esp+4];Fila
-mov eax,80
+__PRINT_TEXT:
+
+;[esp] ;Direccion de retorno
+;[esp+4] ;Columna
+;[esp+8] ;Fila en donde mostar el texto
+;[esp+12] ;Longitud del texto
+;[esp+16] ;Direccion de inicio del texto
+
+mov ebx,[esp+8]
+mov eax,160
 xor edx,edx
 mul ebx
 
 mov esi, BUFFER_VIDEO   ; Puntero a buffer de video, que tiene 80x25 caracteres
 add esi,eax
 
+mov ebx,[esp+4]
+mov eax,2
+xor edx,edx
+mul ebx
+
+add esi,eax
+
 xor eax,eax
 xor ecx,ecx
-mov edx,[esp+8]
+mov edx,[esp+12]
 
 print_cicle:
-  mov ebx,[esp+12]
+  mov ebx,[esp+16]
   mov ebx,[ebx+eax];Puntero al mensaje
   mov cl,bl
   MOV [ESI], bl  ; Escribo en el caracter

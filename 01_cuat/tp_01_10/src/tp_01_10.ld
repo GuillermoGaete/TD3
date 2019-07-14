@@ -41,11 +41,6 @@ __A_CHARACTER = 0x1E;/*A*/
 
 __ENTER_CHARACTER = 0x1C;/*ENTER*/
 
-__DATOS_PROGRAMA = 0x003E0000;
-__FLAG_TIMER = __DATOS_PROGRAMA;
-__COUNT_TIMER = __FLAG_TIMER + 8;
-__ACUM = __COUNT_TIMER + 8;
-
 __INICIO_RESET = 0xFFFFFFF0;
 __INICIO_ROM = 0xFFFF0000;
 __INICIO_RAM = 0x00000000;
@@ -72,12 +67,9 @@ SECTIONS
 		set_idt_handler.elf(.set_idt_handler); /*Solamente la que esta en set_idt_handler.elf*/
 		__INICIO_INVALIDATE_EN_NUCLEO_RAM = .;
 		invalidate_idt.elf(.invalidate_idt); /*Solamente la que esta en invalidate_idt.elf*/
-		__INICIO_PAGINATION_HELPERS_RAM = .;
-		pagination_helpers.elf(.pagination_helpers);
-		__PRINT_NUMBER = .;
-		video_helpers.elf(.print_number);
-		__PRINT_TEXT = .;
-		video_helpers.elf(.print_text);		
+		pagination_helpers.elf(.set_page_structure);
+		video_helpers.elf(.text);
+		tarea_status_bar.elf(.text);
 		*(.nucleo);  /*Voy a colocar todo lo que encuentre en sections nucleo en los archivos de entrada*/
 		__FIN_NUCLEO_RAM = .;
 		/*Calculo el tamanio de mi seccion rutina como la direccion VMA final menos la inicial*/
@@ -111,11 +103,23 @@ SECTIONS
 			__FIN_TEXT_TAREA_1_RAM = .;
 		} AT>rom
 
+		.datos 0x003E0000:
+		{
+			__INICIO_DATA_RAM = .;
+			__INICIO_DATA_ROM = LOADADDR(.datos);
+			rutina_timer.elf(.data);
+			tarea_status_bar.elf(.data);
+			handlers.elf(.data);
+			__FIN_DATA_RAM = .;
+			rutina_timer.elf(.bss);
+			pagination_helpers.elf(.bss);
+			tarea_status_bar.elf(.bss);
+			handlers.elf(.bss);
+		} AT>rom
+
 		.bss_tarea_1 0x00421000:
 		{
-			__INICIO_BSS_TAREA_1_RAM = .;
 			tarea_1.elf(.bss);
-			__FIN_BSS_TAREA_1_RAM = .;
 		} AT>rom
 
 		.data_tarea_1 0x00422000:
@@ -130,22 +134,10 @@ SECTIONS
 		{
 			__INICIO_HANDLERS_RAM = .;
 			__INICIO_HANDLERS_ROM = LOADADDR(.isrs);
-			__INICIO_HANDLER_MAIN_RAM = .;
-			handlers.elf(.handler_main);
-			__INICIO_HANDLER_DE_RAM = .;
-			handlers.elf(.handler_de);
-			__INICIO_HANDLER_UD_RAM = .;
-			handlers.elf(.handler_ud);
-			__INICIO_HANDLER_DF_RAM = .;
-			handlers.elf(.handler_df);
-			__INICIO_HANDLER_GP_RAM = .;
-			handlers.elf(.handler_gp);
-			__INICIO_HANDLER_PF_RAM = .;
-			handlers.elf(.handler_pf);
+			handlers.elf(.text);
 			__INICIO_ISR_TECLADO_RAM = .;
 			rutina_teclado_interrupt.elf(.isr_teclado);
-			__INICIO_ISR_TIMER_RAM = .;
-			rutina_timer.elf(.isr_timer);
+			rutina_timer.elf(.text);
 			__FIN_HANDLERS_RAM = .;
 		} AT >rom
 
@@ -159,3 +151,4 @@ __LONGITUD_TAREAS = __FIN_TAREAS_RAM - __INICIO_TAREAS_RAM;
 __LONGITUD_HANDLERS = __FIN_HANDLERS_RAM - __INICIO_HANDLERS_RAM;
 __LONGITUD_TEXT_TAREA_1 = __FIN_TEXT_TAREA_1_RAM - __INICIO_TEXT_TAREA_1_RAM;
 __LONGITUD_DATA_TAREA_1 = __FIN_DATA_TAREA_1_RAM - __INICIO_DATA_TAREA_1_RAM;
+__LONGITUD_DATA = __FIN_DATA_RAM - __INICIO_DATA_RAM;

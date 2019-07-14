@@ -1,17 +1,45 @@
-section .pagination_helpers
+global __SET_PAGINATION_STRUCTURE
+section .bss
+
+lineal_address_initial: resb 4
+lineal_address_final: resb 4
+phisical_address_initial: resb 4
+
+pagination_directory: resb 4
+tables_page: resb 4
+
+pages_number: resb 32
+directorie_entries_number: resb 4
+
+firts_table_entry: resb 4
+firts_directory_entry: resb 4
+
+lineal_address: resb 4
+
+
+section .set_page_structure
+__SET_PAGINATION_STRUCTURE:
 USE32
-;[esp] ;Direccion de retorno
+;MUEVO LOS PARAMETROS A LAS VARIABLES LOCALES
 
-;[esp+4] ;Inicio del directorio de tablas
-;[esp+8] ;Inicio de la tabla de paginas
+mov eax,[esp+4]
+mov [pagination_directory],eax
 
-;[esp+12] ;Direccion fisica inicial
-;[esp+16] ;Direccion lineal final
-;[esp+20] ;Direccion lineal inicial
+mov eax,[esp+8]
+mov [tables_page],eax
+
+mov eax,[esp+20]
+mov [lineal_address_initial],eax
+
+mov eax,[esp+16]
+mov [lineal_address_final],eax
+
+mov eax,[esp+12]
+mov [phisical_address_initial],eax
 
 compute_directions_amount:
-mov eax,[esp+16] ;Direccion lineal final
-mov ebx,[esp+20] ;Direccion lineal inicial
+mov eax,[lineal_address_final] ;Direccion lineal final
+mov ebx,[lineal_address_initial] ;Direccion lineal inicial
 sub eax,ebx ;Cantidad de direcciones a paginar eax=eax-ebx
 add eax,1 ;Agrego 1 que es la direccion inicial
 
@@ -57,22 +85,10 @@ complete_pagination_tree:
 ;LLego con la cantidad de entradas del directorio de paginas en eax
 ;Cantida de paginas en ebx
 
-push eax
-push ebx
+mov [pages_number],ebx
+mov [directorie_entries_number],eax
 
-;[esp] ; Cantidad de paginas
-;[esp+4] ; Cantidad de entradas del directorio
-
-;[esp+8] ;Direccion de retorno
-
-;[esp+12] ;Inicio del directorio de tablas
-;[esp+16] ;Inicio de la tabla de paginas
-
-;[esp+20] ;Direccion fisica inicial
-;[esp+24] ;Direccion lineal final
-;[esp+28] ;Direccion lineal inicial
-
-mov ecx,[esp+28]
+mov ecx,[lineal_address_initial]
 ror ecx,22
 and ecx,0x3FF
 
@@ -84,10 +100,10 @@ mov ecx,eax
 pop eax
 
 ;Tengo en ecx la primer entrada del arbol de paginacion
-mov edx,[esp+12];INICIO_PAGE_DIRECTORY
+mov edx,[pagination_directory];INICIO_PAGE_DIRECTORY
 add ecx,edx
 
-mov edi,[esp+28]
+mov edi,[lineal_address_initial]
 ror edi,12
 and edi,0x3FF
 
@@ -98,30 +114,16 @@ mul edi
 mov edi,eax
 pop eax
 
-mov edx,[esp+16] ;INICIO_PAGE_TABLE
+mov edx,[tables_page] ;INICIO_PAGE_TABLE
 add edi,edx
 
-push ecx
-push edi
+mov [firts_table_entry],edi
+mov [firts_directory_entry],ecx
 
-;[esp] ; Primer entrada tabla de paginas
-;[esp+4] ; Primer entrada del directorio
 
-;[esp+8] ; Cantidad de paginas
-;[esp+12] ; Cantidad de entradas del directorio
-
-;[esp+16] ;Direccion de retorno
-
-;[esp+20] ;Inicio del directorio de tablas
-;[esp+24] ;Inicio de la tabla de paginas
-
-;[esp+28] ;Direccion fisica inicial
-;[esp+32] ;Direccion lineal final
-;[esp+36] ;Direccion lineal inicial
-
-mov eax,[esp+12] ;Cantidad de entradas directorio
-mov edi,[esp+4] ;Primer entrada del directorio
-mov ecx,[esp] ;Primer entrada tabla de paginas
+mov eax,[directorie_entries_number] ;Cantidad de entradas directorio
+mov edi,[firts_directory_entry] ;Primer entrada del directorio
+mov ecx,[firts_table_entry] ;Primer entrada tabla de paginas
 add ecx,0x3
 
 ciclo_llenado_directorio:
@@ -131,49 +133,20 @@ ciclo_llenado_directorio:
   dec eax
   jnz ciclo_llenado_directorio
 
-  ;[esp] ; Primer entrada tabla de paginas
-  ;[esp+4] ; Primer entrada del directorio
 
-  ;[esp+8] ; Cantidad de paginas
-  ;[esp+12] ; Cantidad de entradas del directorio
-
-  ;[esp+16] ;Direccion de retorno
-
-  ;[esp+20] ;INICIO_PAGE_DIRECTORY
-  ;[esp+24] ;INICIO_PAGE_TABLE
-
-  ;[esp+28] ;Direccion fisica inicial
-  ;[esp+32] ;Direccion lineal final
-  ;[esp+36] ;Direccion lineal inicial
-mov ecx,[esp+8] ;Cantidad de paginas
-mov edi,[esp] ;Primer entrada de tabla de paginas
-mov eax,[esp+28]
+mov ecx,[pages_number] ;Cantidad de paginas
+mov edi,[firts_table_entry] ;Primer entrada de tabla de paginas
+mov eax,[phisical_address_initial]
 add eax,0x3 ;Primer direccion fisica + atributos
 
 ciclo_llenado_paginas:
   mov [edi],eax
   add edi,4
-  add eax,0x1000
+  add eax,0x1000 ;Paso a la siguiente pagina
   dec ecx
   jnz ciclo_llenado_paginas
 
-;   ;Completo la primeras paginas de RAM y las segundas
-;   mov edi,INICIO_PAGE_TABLE_RAM
-;   mov eax,0x00000000+0x3
-;
-; ciclo_llenado_tablas_ram:
-;   mov [edi],eax
-;   add edi,4 ;Me muevo al proximo offset que es 4 bytes
-;   add eax,0x1000 ;la siguiente pagina esta 4kb adelante
-;   dec ecx
-;   jnz ciclo_llenado_tablas_ram
-
-
-
-
-pop eax
-pop eax
-pop eax
-pop eax
-
 ret
+
+section .get_page_from_linear_address
+;MUEVO LOS PARAMETROS A LAS VARIABLES LOCALES

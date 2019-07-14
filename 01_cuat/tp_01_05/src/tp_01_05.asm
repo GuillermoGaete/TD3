@@ -33,9 +33,6 @@ section .init
   		  dw long_gdt-1
   		  dd gdt
 
-
-
-
 inicio:
   cli       ;Deshabilito interrupciones
   db 0x66            ;Requerido para direcciones mayores
@@ -47,7 +44,8 @@ inicio:
 
 USE32
 modo_proteg:
-  mov ax,ds_sel
+  mov ax,ds_sel+0x3 ;Se puede utilizar asi porque TI=0 RPL=00 entonces el selector es igual al indice en la gdt que es de 64 bits
+  ;Si fuera otro RPL se le tiene que sumar el valor
   mov ds,ax
   mov ss,ax ;defino ss y esp dentro del segmento de datos
   mov esp,__FIN_PILA
