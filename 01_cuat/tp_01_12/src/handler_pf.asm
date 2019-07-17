@@ -1,17 +1,7 @@
-GLOBAL __HANDLER_DE
-GLOBAL __HANDLER_GP
 GLOBAL __HANDLER_PF
-GLOBAL __HANDLER_UD
-GLOBAL __HANDLER_DF
 
-EXTERN __FIN_PILA
 EXTERN __PRINT_TEXT
 EXTERN __PRINT_NUMBER
-
-EXTERN FIX_PAGE_ERROR
-
-section .bss
-lineal_address_error resb 4
 
 section .data
 
@@ -52,71 +42,11 @@ LONG_DE_MESSAGE EQU $-DE_MESSAGE
 
 USE32
 section .text
-__HANDLER_MAIN:
-
-  ;[esp] Retorno
-  ;[esp+4] Dx
-  ;[esp + 8-36] Retorno
-
-  ;[esp+40] Error code
-  ;[esp+12] EIP
-  ;[esp+16] CS
-  ;[esp+20] EFLAGS
-  xor edx,edx
-  mov edx, [esp+4] ;En dx tengo el numero de excepcion
-  cmp edx,14 ;Fallo de pagina
-  je page_fault
-  cmp edx,0 ;Division por cero
-  je divide_error
-  jmp return
-return:
-  ret
-
-__HANDLER_DE: ;Divide Error
-  pushad
-  mov edx,0
-  push edx
-  call __HANDLER_MAIN
-  pop edx
-  popad
-  iret
-
-__HANDLER_UD:;Invalid Opcode (Undefined Opcode)
-  pushad
-  mov edx,6
-  push edx
-  call __HANDLER_MAIN
-  pop edx
-  popad
-  iret
-
-__HANDLER_DF:;Double Fault
-  ;Para generarla podemos invalidar la idt de la division por 0 y despues dividir por 0, eso va a producir una falla de segmentacion al vectorizar la
-  ;division por 0
-  pushad
-  mov edx,8
-  push edx
-  call __HANDLER_MAIN
-  pop edx
-  popad
-  iret
-
-__HANDLER_GP: ;General Protection
-  pushad
-  mov edx,13
-  push edx
-  call __HANDLER_MAIN
-  pop edx
-  popad
-  iret
-
 __HANDLER_PF: ;Page Fault
   pushad
   mov edx,14
   push edx
   call __HANDLER_MAIN
-  xchg bx,bx
-  pop edx
   pop edx
   popad
   iret
@@ -138,10 +68,19 @@ __HANDLER_PF: ;Page Fault
     call __PRINT_TEXT
     times 4 pop eax
 
+    ;Print message
+    mov eax,cr2
+
+    push eax
+    push dword 1 ;Cantidad de words
+    push dword 15 ;Fila donde muestro el numero
+    push dword LONG_FP_MESSAGE  ;Columna donde muestro el numero
+    call __PRINT_NUMBER
+    times 4 pop ecx
+
     ;Cargo el mensaje en caso de no haber error
     mov edx,FP_PAGE_PRESENT_NOT
     ;Me fijo el bit correspondiente
-    xchg bx,bx
     mov eax,[esp+40]
     and eax,0x00000001
     cmp eax,0x00000001
@@ -258,29 +197,4 @@ __HANDLER_PF: ;Page Fault
     call __PRINT_TEXT
     times 4 pop eax
 
-    mov eax,cr2
-    mov [lineal_address_error],eax
-
-    push dword [lineal_address_error]
-    push dword 1 ;Cantidad de words
-    push dword 15 ;Fila donde muestro el numero
-    push dword LONG_FP_MESSAGE  ;Columna donde muestro el numero
-    call __PRINT_NUMBER
-    times 4 pop ecx
-
-    ;Print message
-    push dword [lineal_address_error]
-    call FIX_PAGE_ERROR
-    pop eax
-
-
     jmp return
-
-    divide_error:
-      push  dword DE_MESSAGE
-      push  dword LONG_DE_MESSAGE
-      push 23  ;Fila
-      push 0
-      call __PRINT_TEXT
-      times 4 pop eax
-      jmp return

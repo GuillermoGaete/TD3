@@ -1,12 +1,10 @@
 GLOBAL __PRINT_NUMBER
 GLOBAL __PRINT_TEXT
-
+GLOBAL __CLEAR_VIDEO_BUFFER
 USE32
 section .data
 
 BUFFER_VIDEO EQU 0x00010000
-DEFAULT_MESSAGE  DB "El numero acumulado es:"
-LONG_DEFAULT_MESSAGE EQU $-DEFAULT_MESSAGE
 
 section .bss
 fila resb 4
@@ -15,35 +13,10 @@ cantidad_words resb 4
 
 section .text
 __PRINT_NUMBER:
-mov ecx,[esp+4]
-
-mov eax,160
-xor edx,edx
-mul ecx
-
-mov esi, BUFFER_VIDEO   ; Puntero a buffer de video, que tiene 80x25 caracteres
-add esi,eax
-
-xor eax,eax
-xor ecx,ecx
-mov edx,LONG_DEFAULT_MESSAGE
-
-ciclo_mostrar_texto:
-  mov ebx,[DEFAULT_MESSAGE+eax];Puntero al mensaje
-  mov cl,bl
-  MOV [ESI], bl  ; Escribo en el caracter
-  MOV BYTE [ESI+1], 0x07 ;Escribir el atributo
-  ADD ESI, 2  ; Incremento el puntero
-  add eax,1
-  cmp eax,edx
-  jl ciclo_mostrar_texto
-
-mov ecx,[esp+8]
-mov [cantidad_words],ecx
-
+call compute_initial_esi
 mov eax,0
 ciclo_mostrar_numero:
-mov edx,[esp+4*eax+12]
+mov edx,[esp+4*eax+16]
 mov ebx,0
 ciclo_mostrar_dword:
 rol edx,4
@@ -60,9 +33,9 @@ add ebx,1
 cmp ebx,7
 jle ciclo_mostrar_dword
 add eax,1
-cmp dword eax,[cantidad_words]
+mov ebx,[esp+12]
+cmp eax,ebx
 jl ciclo_mostrar_numero
-
 ret
 
 return_ascii:
@@ -76,25 +49,11 @@ finish_return_ascii:
 
 
 __PRINT_TEXT:
-mov ebx,[esp+8]
-mov eax,160
-xor edx,edx
-mul ebx
-
-mov esi, BUFFER_VIDEO   ; Puntero a buffer de video, que tiene 80x25 caracteres
-add esi,eax
-
-mov ebx,[esp+4]
-mov eax,2
-xor edx,edx
-mul ebx
-
-add esi,eax
+call compute_initial_esi
 
 xor eax,eax
 xor ecx,ecx
 mov edx,[esp+12]
-
 print_cicle:
   mov ebx,[esp+16]
   mov ebx,[ebx+eax];Puntero al mensaje
@@ -105,4 +64,35 @@ print_cicle:
   add eax,1
   cmp eax,edx
   jl print_cicle
+ret
+
+__CLEAR_VIDEO_BUFFER:
+call compute_initial_esi
+xor eax,eax
+xor ecx,ecx
+mov edx,[esp+12]
+clear_cicle:
+  MOV BYTE [ESI], 0x00  ; Escribo en el caracter
+  MOV BYTE [ESI+1], 0x00 ;Escribir el atributo
+  ADD ESI, 2  ; Incremento el puntero
+  add eax,1
+  cmp eax,edx
+  jl clear_cicle
+ret
+
+compute_initial_esi:
+mov ebx,[esp+12]
+mov eax,160
+xor edx,edx
+mul ebx
+
+mov esi, BUFFER_VIDEO   ; Puntero a buffer de video, que tiene 80x25 caracteres
+add esi,eax
+
+mov ebx,[esp+8]
+mov eax,2
+xor edx,edx
+mul ebx
+
+add esi,eax
 ret

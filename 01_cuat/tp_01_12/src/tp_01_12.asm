@@ -5,7 +5,7 @@ EXTERN __FIN_NUCLEO_RAM
 
 EXTERN INICIO_PAGE_DIRECTORY
 EXTERN INICIO_PAGE_TABLE_RAM_000
-EXTERN INICIO_PAGE_TABLE_RAM_004
+EXTERN INICIO_PAGE_TABLE_RAM_001
 EXTERN INICIO_PAGE_TABLE_PILA
 EXTERN INICIO_PAGE_TABLE_ROM
 EXTERN SIZE_PAGINATION_STRUCTURE
@@ -153,7 +153,6 @@ modo_proteg:
   call config_irq
   ;A partir de este momento estan habilitadas las interrupciones
   sti
-
   push  dword TP_MESSAGE
   push  dword LONG_TP_MESSAGE
   push 0  ;Fila
@@ -353,6 +352,7 @@ call __SET_PAGINATION_STRUCTURE
 times 5 pop eax
 
 ;ISRS, inicio 0x00000000
+xchg bx,bx
 push dword __INICIO_ISRS_RAM ;Direccion lineal inicial
 push dword __FIN_ISRS_RAM ;Direccion lineal final
 push dword 0x00000000 ;Direcccion fisica inicial
@@ -393,7 +393,7 @@ times 5 pop eax
 push dword __INICIO_NUCLEO_RAM;Direccion lineal inicial
 push dword __FIN_NUCLEO_RAM ;Direccion lineal final
 push dword 0x00400000 ;Direcccion fisica inicial
-push dword INICIO_PAGE_TABLE_RAM_004
+push dword INICIO_PAGE_TABLE_RAM_001
 push dword INICIO_PAGE_DIRECTORY
 call __SET_PAGINATION_STRUCTURE
 times 5 pop eax
@@ -402,7 +402,7 @@ times 5 pop eax
 push dword __INICIO_TABLA_DE_DIGITOS ;Direccion lineal inicial
 push dword __FIN_TABLA_DE_DIGITOS ;Direccion lineal final
 push dword 0x00410000 ;Direcccion fisica inicial
-push dword INICIO_PAGE_TABLE_RAM_004
+push dword INICIO_PAGE_TABLE_RAM_001
 push dword INICIO_PAGE_DIRECTORY
 call __SET_PAGINATION_STRUCTURE
 times 5 pop eax
@@ -411,7 +411,7 @@ times 5 pop eax
 push dword __INICIO_TEXT_TAREA_1_RAM;Direccion lineal inicial
 push dword __FIN_TEXT_TAREA_1_RAM ;Direccion lineal final
 push dword 0x00421000 ;Direcccion fisica inicial
-push dword INICIO_PAGE_TABLE_RAM_004
+push dword INICIO_PAGE_TABLE_RAM_001
 push dword INICIO_PAGE_DIRECTORY
 call __SET_PAGINATION_STRUCTURE
 times 5 pop eax
@@ -420,7 +420,7 @@ times 5 pop eax
 push dword __INICIO_BSS_TAREA_1;Direccion lineal inicial
 push dword __FIN_BSS_TAREA_1 ;Direccion lineal final
 push dword 0x00422000 ;Direcccion fisica inicial
-push dword INICIO_PAGE_TABLE_RAM_004
+push dword INICIO_PAGE_TABLE_RAM_001
 push dword INICIO_PAGE_DIRECTORY
 call __SET_PAGINATION_STRUCTURE
 times 5 pop eax
@@ -429,7 +429,7 @@ times 5 pop eax
 push dword __INICIO_DATA_TAREA_1_RAM;Direccion lineal inicial
 push dword __FIN_DATA_TAREA_1_RAM ;Direccion lineal final
 push dword 0x00423000 ;Direcccion fisica inicial
-push dword INICIO_PAGE_TABLE_RAM_004
+push dword INICIO_PAGE_TABLE_RAM_001
 push dword INICIO_PAGE_DIRECTORY
 call __SET_PAGINATION_STRUCTURE
 times 5 pop eax
@@ -438,7 +438,7 @@ times 5 pop eax
 push dword __INICIO_DATOS_RAM;Direccion lineal inicial
 push dword __FIN_DATOS_RAM ;Direccion lineal final
 push dword 0x004E0000 ;Direcccion fisica inicial
-push dword INICIO_PAGE_TABLE_RAM_004
+push dword INICIO_PAGE_TABLE_RAM_001
 push dword INICIO_PAGE_DIRECTORY
 call __SET_PAGINATION_STRUCTURE
 times 5 pop eax
@@ -456,7 +456,7 @@ times 5 pop eax
 push dword __INICIO_PILA_TAREA_1;Direccion lineal inicial
 push dword __FIN_PILA_TAREA_1 ;Direccion lineal final
 push dword 0x1FFFE000 ;Direcccion fisica inicial
-push dword INICIO_PAGE_TABLE_RAM_004
+push dword INICIO_PAGE_TABLE_RAM_001
 push dword INICIO_PAGE_DIRECTORY
 call __SET_PAGINATION_STRUCTURE
 times 5 pop eax
