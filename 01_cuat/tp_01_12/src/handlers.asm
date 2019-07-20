@@ -7,6 +7,7 @@ GLOBAL __HANDLER_DF
 EXTERN __FIN_PILA
 EXTERN __PRINT_TEXT
 EXTERN __PRINT_NUMBER
+EXTERN __CLEAR_VIDEO_BUFFER
 
 EXTERN FIX_PAGE_ERROR
 
@@ -115,9 +116,8 @@ __HANDLER_PF: ;Page Fault
   mov edx,14
   push edx
   call __HANDLER_MAIN
-  xchg bx,bx
   pop edx
-  pop edx
+  pop edx ;Saco el codigo de error de la pila ya que el procesador lo pushea pero no lo saca :(
   popad
   iret
 
@@ -141,7 +141,6 @@ __HANDLER_PF: ;Page Fault
     ;Cargo el mensaje en caso de no haber error
     mov edx,FP_PAGE_PRESENT_NOT
     ;Me fijo el bit correspondiente
-    xchg bx,bx
     mov eax,[esp+40]
     and eax,0x00000001
     cmp eax,0x00000001
@@ -268,11 +267,38 @@ __HANDLER_PF: ;Page Fault
     call __PRINT_NUMBER
     times 4 pop ecx
 
-    ;Print message
+    ;Aca hago el fix del error de paginacion
     push dword [lineal_address_error]
     call FIX_PAGE_ERROR
     pop eax
 
+    ;Elimino el mensaje de error de paginacion
+    mov ebx,15
+ciclo_limpiar_mensaje:
+    push ebx
+
+    push dword 80
+    push ebx ;Fila
+    push dword 0
+    call __CLEAR_VIDEO_BUFFER
+    times 3 pop eax
+
+    pop ebx
+    inc ebx
+    cmp ebx,22
+    jle ciclo_limpiar_mensaje
+
+    push dword 30
+    push dword 23 ;Fila
+    push dword 0
+    call __CLEAR_VIDEO_BUFFER
+    times 3 pop eax
+
+    push dword 30
+    push dword 24 ;Fila
+    push dword 0
+    call __CLEAR_VIDEO_BUFFER
+    times 3 pop eax
 
     jmp return
 

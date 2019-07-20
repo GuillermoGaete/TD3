@@ -82,6 +82,8 @@ EXTERN TAREA_STATUS_BAR
 EXTERN _pic_configure
 EXTERN _pit_configure
 
+GLOBAL LONG_TP_MESSAGE
+
 TP_MESSAGE  DB "TP 12: Paginacion real - Isaac Guillermo Gaete"
 LONG_TP_MESSAGE EQU $-TP_MESSAGE
 
@@ -352,7 +354,6 @@ call __SET_PAGINATION_STRUCTURE
 times 5 pop eax
 
 ;ISRS, inicio 0x00000000
-xchg bx,bx
 push dword __INICIO_ISRS_RAM ;Direccion lineal inicial
 push dword __FIN_ISRS_RAM ;Direccion lineal final
 push dword 0x00000000 ;Direcccion fisica inicial

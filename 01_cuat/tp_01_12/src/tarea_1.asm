@@ -6,11 +6,17 @@ EXTERN __CURRENT_TABLE_INDEX
 EXTERN __PRINT_NUMBER
 EXTERN __PRINT_TEXT
 
+EXTERN __CURRENT_TABLE_INDEX
+
+EXTERN DIGITOS_MESSAGE
+EXTERN LONG_DIGITOS_MESSAGE
+EXTERN LONG_TP_MESSAGE
+
 EXTERN __CLEAR_VIDEO_BUFFER
 
 USE32
 section .data
-max_address dd 0x02000000
+max_address dd 0x01000000
 ;Messages
 ACUM_MESSAGE  DB "El numero acumulado es:"
 LONG_ACUM_MESSAGE EQU $-ACUM_MESSAGE
@@ -74,6 +80,8 @@ ciclo_suma:
   mov eax,0
   mov [__CURRENT_TABLE_INDEX],eax
 
+  call show_current_index
+
   mov eax,[max_address]
   mov ebx,[low_part_acum]
   mov edx,[high_part_acum]
@@ -128,7 +136,26 @@ read_address:
   call __PRINT_NUMBER
   times 4 pop ecx
 
-
 return:
   hlt
   ret ;Para volver
+
+show_current_index:
+;Muestro en pantalla
+push dword DIGITOS_MESSAGE
+push dword LONG_DIGITOS_MESSAGE
+push dword 23 ;Fila
+push dword LONG_TP_MESSAGE
+call __PRINT_TEXT
+times 4 pop eax
+
+mov eax,LONG_TP_MESSAGE
+add eax,LONG_DIGITOS_MESSAGE
+
+push dword [__CURRENT_TABLE_INDEX]
+push dword 1 ;Cantidad de words
+push dword 23 ;Fila donde muestro el numero
+push eax   ;Columna donde muestro el numero
+call __PRINT_NUMBER
+times 4 pop ecx
+ret

@@ -10,6 +10,10 @@ EXTERN __C_CHARACTER
 EXTERN __B_CHARACTER
 EXTERN __A_CHARACTER
 
+EXTERN LONG_TP_MESSAGE
+EXTERN __PRINT_TEXT
+EXTERN __PRINT_NUMBER
+
 EXTERN __ENTER_CHARACTER
 
 GLOBAL __INICIO_BUFFER_TECLADO
@@ -18,6 +22,8 @@ GLOBAL __CURRENT_TABLE_INDEX
 
 section .data
 __SIZE_BUFFER_TECLADO_BYTES EQU 9
+BUFFER_MESSAGE  DB "Buffer teclado:"
+LONG_BUFFER_MESSAGE EQU $-BUFFER_MESSAGE
 section .bss
 __INICIO_BUFFER_TECLADO resb 9
 __FLAG_TECLADO_READY resb 4
@@ -256,6 +262,23 @@ finish_isr:
   mov al,20h            ;Indicarle al PIC que finalizo la interrupcion.
   out 20h,al
 
+  ;Muestro en pantalla
+  push dword BUFFER_MESSAGE
+  push dword LONG_BUFFER_MESSAGE
+  push dword 24 ;Fila
+  push dword LONG_TP_MESSAGE
+  call __PRINT_TEXT
+  times 4 pop eax
+
+  mov eax,[__INICIO_BUFFER_TECLADO]
+  push eax
+  mov eax,[__INICIO_BUFFER_TECLADO+4]
+  push eax
+  push dword 2 ;Cantidad de words
+  push dword 24 ;Fila donde muestro el numero
+  push dword LONG_TP_MESSAGE+LONG_BUFFER_MESSAGE   ;Columna donde muestro el numero
+  call __PRINT_NUMBER
+  times 5 pop ecx
   ;Como el timer me controla el halt tengo que ver si la tecla enter se presiono
   ;desde aca
   call TAREA_TECLADO

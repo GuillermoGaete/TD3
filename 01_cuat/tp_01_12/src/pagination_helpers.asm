@@ -1,8 +1,21 @@
 EXTERN INICIO_PAGE_DIRECTORY
+EXTERN INICIO_PAGE_TABLE_RAM_000
 GLOBAL __SET_PAGINATION_STRUCTURE
 GLOBAL FIX_PAGE_ERROR
-section .bss
 
+EXTERN __PRINT_TEXT
+EXTERN __PRINT_NUMBER
+
+section .data
+
+phisical_address_backup dd 0x80000000
+NPD_MESSAGE  DB "No present directory:"
+LONG_NPD_MESSAGE EQU $-NPD_MESSAGE
+
+PD_MESSAGE  DB "Present directory:"
+LONG_PD_MESSAGE EQU $-PD_MESSAGE
+
+section .bss
 lineal_address_initial: resb 4
 lineal_address_final: resb 4
 phisical_address_initial: resb 4
@@ -16,7 +29,11 @@ current_phisical_address: resb 4
 current_linear_address: resb 4
 
 lineal_address: resb 4
-lineal_address_to_paginate resb 4
+lineal_address_to_paginate: resb 4
+
+current_table_page_offset: resb 4
+current_directory_offset: resb 4
+current_table_ram: resb 4
 
 section .text
 __SET_PAGINATION_STRUCTURE:
@@ -99,16 +116,16 @@ FIX_PAGE_ERROR:
   mov ecx,[lineal_address_to_paginate]
   ror ecx,12
   and ecx,0x3FF
+  mov [current_table_page_offset],ecx
   rol ecx,2
-  push ecx
 
   ;Directory page offset
   mov ecx,[lineal_address_to_paginate]
   ror ecx,22
   and ecx,0x3FF
+  mov [current_directory_offset],ecx
   rol ecx,2
 
-  xchg bx,bx
   mov eax,INICIO_PAGE_DIRECTORY
   add eax,ecx
   mov ecx,[eax]
@@ -117,17 +134,77 @@ FIX_PAGE_ERROR:
   cmp ecx,0x00000000
   je no_present_directory
   ;Ya esta presente
-  xor edx,edx
-  mov ecx,[eax]
+  push dword PD_MESSAGE
+  push dword LONG_PD_MESSAGE
+  push dword 23  ;Fila
+  push dword 0
+  call __PRINT_TEXT
+  times 4 pop edx
+
+  push dword [current_directory_offset]
+  push dword 1 ;Cantidad de words
+  push dword 23 ;Fila donde muestro el numero
+  push dword LONG_PD_MESSAGE  ;Columna donde muestro el numero
+  call __PRINT_NUMBER
+  times 4 pop ecx
+
+  mov ecx,[current_directory_offset]
+  mov eax,INICIO_PAGE_DIRECTORY
+
+  mov ecx,[eax+ecx*4]
   and ecx,0xFFFFF000
-  mov eax,ecx
+  mov eax,ecx;offset
+
   ;En ecx tengo la base
-  pop ecx
-  mov edx,0x80000000
+  mov edx,[phisical_address_backup]
   add edx,0x3
-  mov [eax+ecx],edx
-  ret
+  mov ecx,[current_table_page_offset]
+  mov [eax+ecx*4],edx
+
+  ;Agrego una pagina a la direccion fisica para paginar
+  add dword [phisical_address_backup],0x1000
+  jmp return
+
 no_present_directory:
 
+  push dword NPD_MESSAGE
+  push dword LONG_NPD_MESSAGE
+  push dword 23  ;Fila
+  push dword 0
+  call __PRINT_TEXT
+  times 4 pop edx
+
+  push dword [current_directory_offset]
+  push dword 1 ;Cantidad de words
+  push dword 23 ;Fila donde muestro el numero
+  push dword LONG_NPD_MESSAGE  ;Columna donde muestro el numero
+  call __PRINT_NUMBER
+  times 4 pop ecx
+
+  mov ebx,INICIO_PAGE_TABLE_RAM_000
+  mov eax,[current_directory_offset]
+  xor edx,edx
+  mov ecx,0x1000
+  mul ecx
+  add ebx,eax
+  mov [current_table_ram],ebx
+  add ebx,0x3
+
+  mov eax,INICIO_PAGE_DIRECTORY
+  mov ecx,[current_directory_offset]
+  mov [eax+ecx*4],ebx
+
+  mov edx,[phisical_address_backup]
+  add edx,0x3
+
+  mov eax,[current_table_ram]
+  mov ecx,[current_table_page_offset]
+  mov [eax+ecx*4],edx
+
+  ;Agrego una pagina a la direccion fisica para paginar
+  add dword [phisical_address_backup],0x1000
+  jmp return
+
 return:
+  xchg bx,bx
 ret

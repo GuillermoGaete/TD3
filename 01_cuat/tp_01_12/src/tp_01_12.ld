@@ -108,6 +108,8 @@ SECTIONS
 			tarea_status_bar.elf(.data);
 			handlers.elf(.data);
 			rutina_teclado_interrupt.elf(.data);
+			tarea_teclado.elf(.data);
+			pagination_helpers.elf(.data);
 			__FIN_DATA_RAM = .;
 			rutina_timer.elf(.bss);
 			pagination_helpers.elf(.bss);
